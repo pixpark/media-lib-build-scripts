@@ -72,12 +72,12 @@ fi
 # avresample
 #CONFIGURE_FLAGS="$CONFIGURE_FLAGS --enable-avresample"
 
-ARCHS="arm64 armv7 x86_64 i386"
+ARCHS="arm64 x86_64"
 
 COMPILE="y"
 LIPO="y"
 
-DEPLOYMENT_TARGET="8.0"
+DEPLOYMENT_TARGET="10.0"
 
 if [ "$*" ]
 then
@@ -109,15 +109,6 @@ then
 		echo 'Trying to install Yasm...'
 		brew install yasm || exit 1
 	fi
-	# if [ ! `which gas-preprocessor.pl` ]
-	# then
-	# 	echo 'gas-preprocessor.pl not found. Trying to install...'
-	# 	(curl -L https://github.com/libav/gas-preprocessor/raw/master/gas-preprocessor.pl \
-	# 		-o /usr/local/bin/gas-preprocessor.pl \
-	# 		&& chmod +x /usr/local/bin/gas-preprocessor.pl) \
-	# 		|| exit 1
-	# fi
-
 	if [ ! -r $SOURCE ]
 	then
 		echo 'FFmpeg source not found. Trying to download...'
@@ -133,7 +124,7 @@ then
 		cd "$SCRATCH/$ARCH"
 
 		CFLAGS="-arch $ARCH"
-		if [ "$ARCH" = "i386" -o "$ARCH" = "x86_64" ]
+		if [ "$ARCH" = "x86_64" ]
 		then
 		    PLATFORM="iPhoneSimulator"
 		    CFLAGS="$CFLAGS -mios-simulator-version-min=$DEPLOYMENT_TARGET"
@@ -148,14 +139,6 @@ then
 
 		XCRUN_SDK=`echo $PLATFORM | tr '[:upper:]' '[:lower:]'`
 		CC="xcrun -sdk $XCRUN_SDK clang"
-
-		# force "configure" to use "gas-preprocessor.pl" (FFmpeg 3.3)
-		# if [ "$ARCH" = "arm64" ]
-		# then
-		#     AS="gas-preprocessor.pl -arch aarch64 -- $CC"
-		# else
-		#     AS="gas-preprocessor.pl -- $CC"
-		# fi
 
 		CXXFLAGS="$CFLAGS"
 		LDFLAGS="$CFLAGS"
